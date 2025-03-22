@@ -58,6 +58,9 @@ $(function () {
     $ajaxUtils.sendGetRequest(
       allCategoriesUrl,
       buildAndShowHomeHTML,
+      function() {
+        global.alert("Failed to load categories. Please try again later.");
+      },
       true
     );
   });
@@ -80,7 +83,11 @@ $(function () {
   // Load the menu categories view
   dc.loadMenuCategories = function () {
     showLoading("#main-content");
-    $ajaxUtils.sendGetRequest(allCategoriesUrl, buildAndShowCategoriesHTML);
+    $ajaxUtils.sendGetRequest(allCategoriesUrl, function(categories) {
+      buildAndShowCategoriesHTML(categories);
+    }, function() {
+      global.alert("Failed to load categories. Please try again later.");
+    });
   };
 
   // Load the menu items view

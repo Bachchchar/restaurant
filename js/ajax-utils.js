@@ -20,13 +20,11 @@ function getRequestObject() {
 
 // Makes an Ajax GET request to 'requestUrl'
 ajaxUtils.sendGetRequest = 
-  function(requestUrl, responseHandler, isJsonResponse) {
+  function(requestUrl, responseHandler, errorHandler, isJsonResponse) {
     var request = getRequestObject();
     request.onreadystatechange = 
       function() { 
-        handleResponse(request, 
-                       responseHandler,
-                       isJsonResponse); 
+        handleResponse(request, responseHandler, errorHandler, isJsonResponse); 
       };
     request.open("GET", requestUrl, true);
     request.send(null); // for POST only
@@ -37,9 +35,15 @@ ajaxUtils.sendGetRequest =
 // and not an error
 function handleResponse(request,
                         responseHandler,
+                        errorHandler,
                         isJsonResponse) {
     if (request.readyState == 4) {
-        if (request.status == 200) {
+        if (request.status != 200) {
+            if (errorHandler) {
+                errorHandler();
+            }
+            global.alert("There was a problem with the request. Please check your connection or try again later.");
+        } else {
             // Handle success
             if (isJsonResponse === undefined) {
                 isJsonResponse = true;
@@ -50,8 +54,6 @@ function handleResponse(request,
             } else {
                 responseHandler(request.responseText);
             }
-        } else {
-            global.alert("There was a problem with the request. Status: " + request.status);
         }
     }
 }
